@@ -1,32 +1,30 @@
 title: "Blog Cyber de Hourso"
-description: "Mes labs, mes recherches et mes apprentissages en cybersécurité."
+description: "Labs, recherches et apprentissages en cybersécurité."
 url: "https://hourso.github.io"
 baseurl: ""
 
-# --- Thème ---
 remote_theme: "mmistakes/minimal-mistakes"
 
-# Langue du site
+# Thème visuel (tu peux tester : default, air, mint, neon, dark)
+minimal_mistakes_skin: "default"
+
 locale: "fr-FR"
 
-# Auteur
 author:
   name: "Hourso"
-  bio: "Passionné de cybersécurité (AD, SOC, IAM, Samba, etc.)."
+  avatar: "/assets/images/avatar.png"   # on verra après
+  bio: "Cybersécurité : AD, SOC, IAM, labs…"
   location: "France"
   links:
     - label: "GitHub"
       icon: "fab fa-github"
       url: "https://github.com/hourso"
 
-# Mise en page de base
-layout: single
+permalink: /:categories/:title/
 
-# Activer les posts
 paginate: 5
 paginate_path: "/page:num/"
 
-# Plugins (supportés par GitHub Pages)
 plugins:
-  - jekyll-seo-tag
   - jekyll-paginate
+  - jekyll-seo-tag
