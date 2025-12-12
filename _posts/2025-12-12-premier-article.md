@@ -1,15 +1,10 @@
 ---
-layout: post
-title: "Hello Cyber !"
+layout: single
+title: "Mon premier article cyber"
+date: 2025-12-12
+tags: [cybersecurite, lab, blog]
 ---
 
-Bienvenue sur mon premier article de blog cybersécurité 🔐
+Bienvenue dans mon premier article !
 
-Je vais utiliser ce blog pour :
-
-- apprendre chaque semaine un nouveau concept cyber
-- documenter mes labs (AD, Samba, SOC, etc.)
-- partager mes notes, astuces, et erreurs
-- progresser tout en aidant les autres
-
-À très vite pour le prochain article 😊
+Ici je documente ce que j'apprends en cybersécurité, afin de mieux comprendre et partager ce que j’étudie.
