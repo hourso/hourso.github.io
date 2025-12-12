@@ -1,0 +1,12 @@
+title: "Blog Cyber de Hourso"
+description: "Mes notes, mes labs et mes apprentissages en cybersécurité."
+theme: minima
+
+markdown: kramdown
+paginate: 5
+
+author:
+  name: "Hourso"
+
+plugins:
+  - jekyll-paginate
