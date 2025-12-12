@@ -4,17 +4,13 @@ url: "https://hourso.github.io"
 baseurl: ""
 
 remote_theme: "mmistakes/minimal-mistakes"
-
-# Thème visuel (tu peux tester : default, air, mint, neon, dark)
 minimal_mistakes_skin: "default"
 
 locale: "fr-FR"
 
 author:
   name: "Hourso"
-  avatar: "/assets/images/avatar.png"   # on verra après
   bio: "Cybersécurité : AD, SOC, IAM, labs…"
-  location: "France"
   links:
     - label: "GitHub"
       icon: "fab fa-github"
@@ -28,3 +24,4 @@ paginate_path: "/page:num/"
 plugins:
   - jekyll-paginate
   - jekyll-seo-tag
+  - jekyll-include-cache
