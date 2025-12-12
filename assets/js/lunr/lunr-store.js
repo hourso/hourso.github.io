@@ -1,7 +1,7 @@
 var store = [{
         "title": "Comprendre Kerberos simplement",
-        "excerpt":"Contenu de l’article…  ","categories": ["ActiveDirectory"],
+        "excerpt":"Contenu de l’article…  ","categories": ["Active Directory"],
         "tags": ["kerberos","authentification"],
-        "url": "/activedirectory/comprendre-kerberos-simplement/",
+        "url": "/active%20directory/comprendre-kerberos-simplement/",
         "teaser": null
       }]
