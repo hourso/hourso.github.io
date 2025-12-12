@@ -1,10 +1,16 @@
 ---
 layout: home
-title: "Bienvenue sur mon Blog Cyber"
+title: "Blog Cyber de Hourso"
+excerpt: "Apprendre, tester, partager."
+author_profile: true
 ---
 
-# 👋 Bienvenue sur mon blog !
+Bienvenue sur mon blog dédié à la cybersécurité 🔐
 
-Je partage ici mes apprentissages en cybersécurité : Active Directory, IAM, SOC, Samba AD, etc.
+Je partage ici :
 
-Ce blog me sert à approfondir mes connaissances et à documenter mes progrès.
+- des notes techniques (Active Directory, Samba, IAM, SOC…)
+- des labs que je monte pour apprendre
+- des explications simples sur des sujets que j’étudie
+
+Mon objectif : **apprendre en profondeur** et documenter ce que j’apprends.
