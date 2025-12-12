@@ -15,6 +15,10 @@ author:
     - label: "GitHub"
       icon: "fab fa-github"
       url: "https://github.com/hourso"
+    - label: "LinkedIn"
+      icon: "fab fa-linkedin"
+      url: "https://linkedin.com/in/haroun-a-mahamat"
+
 
 permalink: /:categories/:title/
 
