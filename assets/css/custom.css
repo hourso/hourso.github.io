@@ -1,0 +1,24 @@
+/* Texte principal plus dense et lisible */
+.page__content p,
+.page__content li {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+/* Titres plus marqués */
+.page__content h1,
+.page__content h2,
+.page__content h3 {
+  font-weight: 600;
+}
+
+/* Largeur max du contenu */
+.page__content {
+  max-width: 920px;
+}
+
+/* Réduction du côté "aéré" */
+.page__content > * + * {
+  margin-top: 1rem;
+}
