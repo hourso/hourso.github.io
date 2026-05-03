@@ -1320,6 +1320,71 @@ body { display: -webkit-box; display: -ms-flexbox; display: flex; min-height: 10
   .page__hero-caption a { color: #000 !important; }
   /* Hide the following elements on print ========================================================================== */
   .masthead, .toc, .page__share, .page__related, .pagination, .ads, .page__footer, .page__comments-form, .author__avatar, .author__content, .author__urls-wrapper, .nav__list, .sidebar, .adsbygoogle { display: none !important; height: 1px !important; } }
+/* ========================================================================== Cyber theme customization ========================================================================== */
+body { background-image: linear-gradient(to bottom, #081108, #050805); }
+
+#main { box-shadow: 0 0 100px 50px #00ff4110; }
+
+.archive, .page, .single { background: transparent; }
+
+.page__content h1, .page__content h2, .page__content h3, .page__content h4, .page__content h5, .page__content h6 { color: #00ff41; }
+.page__content p, .page__content li, .page__content dt, .page__content dd { color: rgba(241, 255, 244, 0.9252941176); }
+.page__content a { color: #00d9ff; }
+.page__content code { background: #00260a; color: #00ff41; }
+.page__content pre.highlight { background: rgba(10, 10, 10, 0.8); border-color: rgba(0, 255, 65, 0.2); box-shadow: 0 0 20px rgba(0, 255, 65, 0.1); }
+.page__content pre.highlight code { background: initial; }
+
+.page__meta, .comment__date, .comment__date { color: rgba(0, 255, 65, 0.5); }
+
+.masthead { background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), #000 90%); }
+.masthead__inner-wrap { padding: 1em; background: rgba(0, 0, 0, 0.2); }
+.masthead__menu { background: rgba(0, 0, 0, 0.1); box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
+.masthead__menu-item { color: #008f11; text-shadow: 0 0 10px #00ff41; }
+.masthead__menu-item:hover { color: #00ff41; }
+.masthead__menu-item.active { color: #fff; background: #00ff41; text-shadow: none; }
+
+.greedy-nav .visible-links a:before { background: #008f11; }
+.greedy-nav__toggle { background-color: rgba(0, 0, 0, 0.8); border: 1px solid #008f11; box-shadow: 0 0 10px #00ff4180; }
+.greedy-nav__toggle:before { color: #00ff41; }
+.greedy-nav__toggle.close:before { color: #ffb000; }
+.greedy-nav .hidden-links { background: rgba(0, 0, 0, 0.8); border: 1px solid #008f11; box-shadow: 0 0 10px rgba(0, 255, 65, 0.5); }
+.greedy-nav a { color: #008f11; text-shadow: 0 0 10px #00ff41; }
+.greedy-nav a:hover { color: #00ff41; }
+
+.archive__item { border-bottom: 1px dashed rgba(0, 255, 65, 0.2); }
+.archive__item-title a { color: #00ff41; }
+.archive__item-title a:hover { color: #00d9ff; }
+.archive__subtitle { color: rgba(0, 255, 65, 0.6); }
+
+.pagination { box-shadow: 0 0 20px rgba(0, 255, 65, 0.1); }
+.pagination--pager { border: 1px solid rgba(0, 255, 65, 0.2); background: rgba(0, 0, 0, 0.8); }
+.pagination--pager:hover { background: rgba(0, 255, 65, 0.1); }
+.pagination a { color: #008f11; }
+.pagination a:hover { color: #00ff41; }
+.pagination .disabled { color: rgba(0, 255, 65, 0.2); }
+
+.page__taxonomy-item { border: 1px solid #008f11; background: rgba(0, 255, 65, 0.1); text-shadow: 0 0 5px #00ff41; }
+.page__taxonomy-item:hover { background: rgba(0, 255, 65, 0.3); text-shadow: 0 0 10px #00ff41; }
+
+.back-to-top { color: #00ff41; text-shadow: 0 0 5px #00ff41; }
+
+.author__avatar { border-color: rgba(255, 60, 176, 0.5); box-shadow: 0 0 20px rgba(255, 60, 176, 0.3); background-color: rgba(0, 0, 0, 0.2); }
+
+.author__urls.social-icons .fa { color: #008f11; }
+.author__urls.social-icons a:hover .fa { color: #00ff41; text-shadow: 0 0 5px #00ff41; }
+
+/* Terminal title effect */
+.hero-title { font-family: 'VT323', monospace; font-size: clamp(56px, 11vw, 130px); line-height: 0.85; color: #00ff41; text-shadow: 0 0 18px rgba(0, 255, 65, 0.4), 0 0 2px #00ff41; position: relative; display: inline-block; }
+.hero-title::before, .hero-title::after { content: attr(data-text); position: absolute; inset: 0; pointer-events: none; }
+.hero-title::before { color: #ff003c; mix-blend-mode: screen; transform: translate(-2px, 0); opacity: 0.7; animation: glitch1 5s infinite; }
+.hero-title::after { color: #00ffff; mix-blend-mode: screen; transform: translate(2px, 0); opacity: 0.7; animation: glitch2 5s infinite; }
+
+@keyframes glitch1 { 0%, 92%, 100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+  93% { transform: translate(-3px, 1px); clip-path: inset(20% 0 30% 0); }
+  95% { transform: translate(2px, -1px); clip-path: inset(60% 0 10% 0); } }
+@keyframes glitch2 { 0%, 92%, 100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+  93% { transform: translate(3px, -1px); clip-path: inset(40% 0 50% 0); }
+  95% { transform: translate(-2px, 1px); clip-path: inset(10% 0 70% 0); } }
 /* ========================= OVERRIDES SAFE (compatibles GitHub Pages) ========================= */
 .page__content { max-width: 980px; }
 
