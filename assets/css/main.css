@@ -1325,6 +1325,7 @@ body { background-color: #010101; color: #00ff4160; }
 
 #main { background-color: #040404; box-shadow: 0 0 100px 50px #00ff4110; }
 
+.page__content { max-width: 800px; margin-left: auto; margin-right: auto; }
 .page__content h1, .page__content h2, .page__content h3, .page__content h4, .page__content h5, .page__content h6 { color: #00ff41; }
 .page__content p, .page__content li, .page__content dt, .page__content dd { color: rgba(237, 255, 241, 0.8441176471); }
 .page__content a { color: #00d9ff; }
