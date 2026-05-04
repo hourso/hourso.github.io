@@ -1,0 +1,359 @@
+
+
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.28.0 by Michael Rose
+  Copyright 2013-2026 Michael Rose - mademistakes.com | @mmistakes
+  Copyright 2024-2026 iBug - ibugone.com | @iBug
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+
+<html lang="fr-FR" class="no-js" dir="ltr">
+  <head>
+    
+<meta charset="utf-8">
+
+
+<!-- begin _includes/seo.html --><title>Introduction : pourquoi parler de Kerberos ? - Blog Cyber de Haroun</title>
+<meta name="description" content="Si tu travailles dans un environnement Windows, que ce soit en entreprise ou dans un SOC, tu as forcément entendu parler de Kerberos. C’est le protocole d’authentification par défaut d’Active Directory depuis Windows 2000. Et pourtant, peu de gens savent vraiment comment il fonctionne.">
+
+
+  <meta name="author" content="Haroun MAHAMAT">
+  
+  <meta property="article:author" content="Haroun MAHAMAT">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Blog Cyber de Haroun">
+<meta property="og:title" content="Introduction : pourquoi parler de Kerberos ?">
+<meta property="og:url" content="https://hourso.github.io/ad/comprendre-kerberos-simplement/">
+
+
+  <meta property="og:description" content="Si tu travailles dans un environnement Windows, que ce soit en entreprise ou dans un SOC, tu as forcément entendu parler de Kerberos. C’est le protocole d’authentification par défaut d’Active Directory depuis Windows 2000. Et pourtant, peu de gens savent vraiment comment il fonctionne.">
+
+
+
+  <meta property="og:image" content="https://hourso.github.io/assets/images/kerberos-header.jpg">
+  
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2026-05-04T08:00:00+00:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://hourso.github.io/ad/comprendre-kerberos-simplement/">
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Blog Cyber de Haroun Feed">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    
+<nav class="skip-links" aria-label="Skip links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav" aria-label="Primary navigation">
+        
+        <a class="site-title" href="/">
+          Blog Cyber de Haroun
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a
+                href="/"
+                
+                
+              >Accueil</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/year-archive/"
+                
+                
+              >Articles</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/categories/"
+                
+                
+              >Catégories</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/about/"
+                
+                
+              >À propos</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+  
+
+
+
+
+
+
+
+
+<div class="page__hero--overlay"
+  style=" background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/assets/images/kerberos-header.jpg');"
+>
+  
+    <div class="wrapper">
+      <h1 id="page-title" class="page__title" itemprop="headline">
+        
+          Introduction : pourquoi parler de Kerberos ?
+
+        
+      </h1>
+      
+        <p class="page__lead">Si tu travailles dans un environnement Windows, que ce soit en entreprise ou dans un SOC, tu as forcément entendu parler de Kerberos. C’est le protocole d’authentification par défaut d’Active Directory depuis Windows 2000. Et pourtant, peu de gens savent vraiment comment il fonctionne.
+</p>
+      
+      
+
+
+
+      
+    </div>
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Introduction : pourquoi parler de Kerberos ?">
+    <meta itemprop="description" content="Si tu travailles dans un environnement Windows, que ce soit en entreprise ou dans un SOC, tu as forcément entendu parler de Kerberos. C’est le protocole d’authentification par défaut d’Active Directory depuis Windows 2000. Et pourtant, peu de gens savent vraiment comment il fonctionne.">
+    <meta itemprop="datePublished" content="2026-05-04T08:00:00+00:00">
+    
+
+    <div class="page__inner-wrap">
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+        <p>Si tu travailles dans un environnement Windows, que ce soit en entreprise ou dans un SOC, tu as forcément entendu parler de Kerberos. C’est le protocole d’authentification par défaut d’Active Directory depuis Windows 2000. Et pourtant, peu de gens savent vraiment comment il fonctionne.</p>
+
+<p>Pourquoi c’est important pour toi, en cyber ?</p>
+
+<p>Parce que Kerberos est devenu une cible privilégiée des attaquants. Kerberoasting, AS-REP Roasting, Golden Ticket, Silver Ticket… Ces noms te disent peut-être quelque chose. Ce sont toutes des attaques qui exploitent le fonctionnement même de Kerberos. Et la mauvaise nouvelle, c’est qu’elles sont discrètes, efficaces et toujours exploitées en 2025.</p>
+
+<p>L’objectif de cet article : que tu comprennes Kerberos sans te noyer dans la RFC 4120, que tu saches pourquoi il a été conçu, comment il marche concrètement, quelles sont ses faiblesses et surtout comment détecter les attaques qui l’exploitent.</p>
+
+<h2 id="1-à-quoi-sert-kerberos-">1. À quoi sert Kerberos ?</h2>
+
+<p>Le problème qu’il résout :</p>
+
+<ul>
+  <li>Dans un domaine, un utilisateur veut accéder à une ressource (partage fichier, serveur web, imprimante…)</li>
+  <li>Mais cette ressource n’a aucun moyen de vérifier que l’utilisateur est bien celui qu’il prétend être</li>
+  <li>Il faut donc un tiers de confiance, un “dieu de l’authentification” que tout le monde croit sur parole</li>
+</ul>
+
+<p>C’est là qu’intervient Kerberos. Son rôle :</p>
+
+<ol>
+  <li>Authentifier les utilisateurs quand ils se connectent (prouvent qu’ils sont bien eux)</li>
+  <li>Leur donner un jeton (TGT) qui dit “je confirme que cet utilisateur est légitime”</li>
+  <li>Permettre à ce jeton d’être présenté aux ressources pour accéder</li>
+</ol>
+
+<p>Plutôt que de faire confiance à l’utilisateur, on fait confiance à Kerberos. C’est lui qui certifie l’identité.</p>
+
+<p>Ça paraît simple comme ça, mais il y a beaucoup de subtilités :</p>
+
+<ul>
+  <li>Comment empêcher qu’un attaquant ne vole le jeton d’un autre ?</li>
+  <li>Comment faire en sorte que le jeton ne puisse être utilisé QUE par le bon utilisateur et la bonne ressource ?</li>
+  <li>Comment éviter de redemander sans cesse le mot de passe de l’utilisateur ?</li>
+  <li>Comment révoquer un jeton si besoin ?</li>
+</ul>
+
+<p>On verra dans la suite de l’article que Kerberos a des réponses à toutes ces questions. Parfois bonnes, parfois moins…</p>
+
+<h2 id="2-les-rôles--qui-fait-quoi-">2. Les rôles : qui fait quoi ?</h2>
+
+<p>Dans un échange Kerberos, il y a 3 acteurs principaux :</p>
+
+<ul>
+  <li>Le client : l’utilisateur qui veut accéder à une ressource</li>
+  <li>Le serveur : la ressource à laquelle l’utilisateur veut accéder</li>
+  <li>Le KDC (Key Distribution Center) : le “dieu” de l’authentification qui certifie les identités</li>
+</ul>
+
+<p>Le client et le serveur font tous les deux confiance au KDC. Ils partagent avec lui une clé secrète qui permet de chiffrer les communications.</p>
+
+<p>Ça fonctionne un peu comme une ambassade qui délivrerait des passeports :</p>
+
+<ul>
+  <li>Le client va voir le KDC et prouve son identité (avec son mot de passe)</li>
+  <li>Le KDC lui délivre un “passeport” (le TGT) qui certifie cette identité</li>
+  <li>Le client présente ce passeport au serveur pour accéder</li>
+  <li>Le serveur appelle le KDC pour vérifier l’authenticité du passeport</li>
+</ul>
+
+<p>On verra dans le prochain article le détail technique de ces échanges. Mais ce qu’il faut retenir pour le moment c’est ce principe de tiers de confiance.</p>
+
+<p>Le KDC joue un rôle central, c’est lui qui détient les clés de tout le royaume. S’il est compromis, c’est tout le château de cartes qui s’effondre. C’est pourquoi c’est souvent lui la cible des attaquants.</p>
+
+<p><em>Article suivant : <a href="/kerberos-details/">Kerberos en détails : le déroulé d’une authentification</a></em></p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+  
+
+  
+
+
+        
+
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time class="dt-published" datetime="2026-05-04T08:00:00+00:00">May 4, 2026</time></p>
+
+
+      </footer>
+
+      
+
+      
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+      
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        
+
+
+<div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-square-rss" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+
+<div class="page__footer-copyright">&copy; 2026 <a href="https://hourso.github.io">Blog Cyber de Haroun</a>. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/jekyll-themes/minimal-mistakes/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
