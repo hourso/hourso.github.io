@@ -153,59 +153,41 @@
 
     <div class="initial-content">
       <h2 id="introduction--pourquoi-parler-de-kerberos-">Introduction : pourquoi parler de Kerberos ?</h2>
-
 <p>Si tu travailles dans un environnement Windows, que ce soit en entreprise ou dans un SOC, tu as forcément entendu parler de <strong>Kerberos</strong>. C’est le protocole d’authentification par défaut d’<strong>Active Directory</strong> depuis Windows 2000. Et pourtant, peu de gens savent vraiment comment il fonctionne.</p>
 
-<p>Pourquoi c’est important pour toi, en cyber ?</p>
-
-<p>Parce que <strong>Kerberos est devenu une cible privilégiée des attaquants</strong>. Kerberoasting, AS-REP Roasting, Golden Ticket, Silver Ticket… Ces noms te disent peut-être quelque chose. Ce sont toutes des attaques qui exploitent le fonctionnement même de Kerberos. Et la mauvaise nouvelle, c’est qu’elles sont <strong>discrètes, efficaces et toujours exploitées en 2025</strong>.</p>
-
-<p>L’objectif de cet article : que tu comprennes Kerberos sans te noyer dans la RFC 4120, que tu saches <strong>pourquoi il a été conçu</strong>, <strong>comment il marche concrètement</strong>, <strong>quelles sont ses faiblesses</strong> et surtout <strong>comment détecter les attaques</strong> qui l’exploitent.</p>
+<p>Pourquoi c’est important pour toi, en cyber ?
+Parce que <strong>Kerberos est devenu une cible privilégiée des attaquants</strong>. Kerberoasting, AS-REP Roasting, Golden Ticket, Silver Ticket… Ces noms te disent peut-être quelque chose. Ce sont toutes des attaques qui exploitent le fonctionnement même de Kerberos. Et la mauvaise nouvelle, c’est qu’elles sont <strong>discrètes, efficaces et toujours exploitées en 2025</strong>.
+L’objectif de cet article : que tu comprennes Kerberos sans te noyer dans la RFC 4120, que tu saches <strong>pourquoi il a été conçu</strong>, <strong>comment il marche concrètement</strong>, <strong>quelles sont ses faiblesses</strong> et surtout <strong>comment détecter les attaques</strong> qui l’exploitent.</p>
 
 <hr />
 
 <h2 id="1-à-quoi-sert-kerberos-">1. À quoi sert Kerberos ?</h2>
-
 <h3 id="le-problème-quil-résout">Le problème qu’il résout</h3>
-
 <p>Imagine une entreprise avec 5000 utilisateurs et 200 serveurs. Sans système d’authentification centralisé, chaque serveur devrait :</p>
-
 <ul>
   <li>stocker les mots de passe de tous les utilisateurs,</li>
   <li>vérifier l’identité à chaque connexion,</li>
-  <li>maintenir sa propre base de comptes.</li>
-</ul>
-
-<p>C’est ingérable. Et surtout c’est <strong>dangereux</strong> : si un seul serveur est compromis, tous les mots de passe sont exposés.</p>
-
-<p>Kerberos résout ce problème avec une idée simple : <strong>un tiers de confiance qui authentifie tout le monde, une fois</strong>.</p>
-
-<h3 id="lanalogie-du-parc-dattractions">L’analogie du parc d’attractions</h3>
-
-<p>C’est l’analogie que je préfère pour expliquer Kerberos :</p>
-
-<ol>
-  <li><strong>Tu arrives au parc</strong> (tu allumes ton PC).</li>
-  <li><strong>Tu vas à la caisse, tu présentes ton identité et tu paies</strong> (tu tapes ton mot de passe).</li>
-  <li><strong>On te donne un bracelet</strong> (le <strong>TGT</strong> - Ticket Granting Ticket). Ce bracelet prouve que tu as payé l’entrée.</li>
-  <li><strong>Tu veux faire le grand huit</strong> (accéder à un serveur de fichiers). Tu vas au guichet de l’attraction, tu montres ton bracelet et on te donne un <strong>ticket spécifique</strong> pour cette attraction (le <strong>TGS</strong> - Ticket Granting Service).</li>
-  <li><strong>Tu donnes ce ticket à l’opérateur du grand huit</strong> (le serveur de fichiers) qui te laisse monter sans te redemander qui tu es.</li>
-</ol>
-
-<p>L’idée centrale : <strong>tu tapes ton mot de passe une seule fois</strong> (à l’entrée du parc), et ensuite tout se fait avec des tickets temporaires.</p>
-
-<p><img src="/assets/images/Kerberos/kerberos-analogie.svg" alt="Analogie Kerberos avec un parc d'attractions" />
-<em>L’authentification Kerberos comparée à l’entrée d’un parc d’attractions</em></p>
-
-<hr />
-
-<h2 id="2-le-mécanisme-de-kerberos-en-détail">2. Le mécanisme de Kerberos en détail</h2>
-
-<h3 id="les-acteurs">Les acteurs</h3>
-
-<p>Avant de plonger dans les échanges, il faut connaître les acteurs :</p>
-
-<ul>
+  <li>maintenir sa propre base de comptes.
+C’est ingérable. Et surtout c’est <strong>dangereux</strong> : si un seul serveur est compromis, tous les mots de passe sont exposés.
+Kerberos résout ce problème avec une idée simple : <strong>un tiers de confiance qui authentifie tout le monde, une fois</strong>.
+    <h3 id="lanalogie-du-parc-dattractions">L’analogie du parc d’attractions</h3>
+    <p>C’est l’analogie que je préfère pour expliquer Kerberos :</p>
+    <ol>
+      <li><strong>Tu arrives au parc</strong> (tu allumes ton PC).</li>
+      <li><strong>Tu vas à la caisse, tu présentes ton identité et tu paies</strong> (tu tapes ton mot de passe).</li>
+      <li><strong>On te donne un bracelet</strong> (le <strong>TGT</strong> - Ticket Granting Ticket). Ce bracelet prouve que tu as payé l’entrée.</li>
+      <li><strong>Tu veux faire le grand huit</strong> (accéder à un serveur de fichiers). Tu vas au guichet de l’attraction, tu montres ton bracelet et on te donne un <strong>ticket spécifique</strong> pour cette attraction (le <strong>TGS</strong> - Ticket Granting Service).</li>
+      <li><strong>Tu donnes ce ticket à l’opérateur du grand huit</strong> (le serveur de fichiers) qui te laisse monter sans te redemander qui tu es.
+L’idée centrale : <strong>tu tapes ton mot de passe une seule fois</strong> (à l’entrée du parc), et ensuite tout se fait avec des tickets temporaires.
+<img src="/assets/images/Kerberos/kerberos-analogie.svg" alt="Analogie Kerberos avec un parc d'attractions" />
+<em>L’authentification Kerberos comparée à l’entrée d’un parc d’attractions</em>
+—
+        <h2 id="2-le-mécanisme-de-kerberos-en-détail">2. Le mécanisme de Kerberos en détail</h2>
+        <h3 id="les-acteurs">Les acteurs</h3>
+        <p>Avant de plonger dans les échanges, il faut connaître les acteurs :</p>
+      </li>
+    </ol>
+  </li>
   <li><strong>Le client</strong> : c’est toi, ton poste de travail.</li>
   <li><strong>Le KDC</strong> (<em>Key Distribution Center</em>) : le tiers de confiance. Sur Active Directory, c’est le <strong>contrôleur de domaine</strong>. Il se compose de deux services :
     <ul>
@@ -213,15 +195,13 @@
       <li><strong>TGS</strong> (<em>Ticket Granting Service</em>) : celui qui délivre les tickets de service.</li>
     </ul>
   </li>
-  <li><strong>Le service</strong> : la ressource à laquelle tu veux accéder (partage de fichiers, base SQL, site SharePoint…).</li>
-</ul>
-
-<h3 id="les-6-échanges-de-kerberos">Les 6 échanges de Kerberos</h3>
-
-<p>Concrètement, une authentification Kerberos se fait en <strong>3 paires de messages</strong> :</p>
-
-<p>##<img src="/assets/images/Kerberos/kerberos-flow.svg" alt="Flux d'authentification Kerberos" />
+  <li><strong>Le service</strong> : la ressource à laquelle tu veux accéder (partage de fichiers, base SQL, site SharePoint…).
+    <h3 id="les-6-échanges-de-kerberos">Les 6 échanges de Kerberos</h3>
+    <p>Concrètement, une authentification Kerberos se fait en <strong>3 paires de messages</strong> :
+##<img src="/assets/images/Kerberos/kerberos-flow.svg" alt="Flux d'authentification Kerberos" />
 <em>Les 6 échanges de Kerberos entre le client, le KDC et le service</em></p>
+  </li>
+</ul>
 
 <h4 id="étape-1--as-req--as-rep-lauthentification-initiale">Étape 1 : AS-REQ / AS-REP (l’authentification initiale)</h4>
 
