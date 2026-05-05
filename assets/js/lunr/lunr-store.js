@@ -5,7 +5,7 @@ var store = [{
         "url": "/active%20directory/comprendre-kerberos-simplement/",
         "teaser": "/assets/images/Kerberos/kerberos-flow.svg"
       },{
-        "title": "CNTLM : faiblesses, attaques et bonnes pratiques",
+        "title": "NTLM : faiblesses, attaques et bonnes pratiques",
         "excerpt":"NTLM (NT LAN Manager) est un protocole d’authentification utilisé principalement dans les environnements Microsoft Windows. Malgré son ancienneté et ses faiblesses connues, il reste très répandu, souvent pour des raisons de compatibilité. L’une des principales vulnérabilités de NTLM est sa sensibilité à l’attaque “Pass-the-Hash” (PtH). Comprendre son fonctionnement est essentiel...","categories": ["active directory"],
         "tags": ["NTLM","active directory","authentification","cybersecurité"],
         "url": "/active%20directory/ntlm-faiblesses-attaques-bonnes-pratiques/",

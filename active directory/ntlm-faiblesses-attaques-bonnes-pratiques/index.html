@@ -15,7 +15,7 @@
 <meta charset="utf-8">
 
 
-<!-- begin _includes/seo.html --><title>CNTLM : faiblesses, attaques et bonnes pratiques - Blog Cyber de Haroun</title>
+<!-- begin _includes/seo.html --><title>NTLM : faiblesses, attaques et bonnes pratiques - Blog Cyber de Haroun</title>
 <meta name="description" content="NTLM est un protocole d’authentification largement utilisé dans les environnements Windows. Malheureusement, il souffre de faiblesses intrinsèques qui le rendent vulnérable à des attaques comme le Pass-the-Hash. Découvrez comment ça marche et surtout comment s’en prémunir.">
 
 
@@ -28,7 +28,7 @@
 <meta property="og:type" content="article">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Blog Cyber de Haroun">
-<meta property="og:title" content="CNTLM : faiblesses, attaques et bonnes pratiques">
+<meta property="og:title" content="NTLM : faiblesses, attaques et bonnes pratiques">
 <meta property="og:url" content="https://hourso.github.io/active%20directory/ntlm-faiblesses-attaques-bonnes-pratiques/">
 
 
@@ -206,24 +206,12 @@
 <p>Heureusement, il existe plusieurs moyens de se prémunir contre ces attaques et de durcir son environnement Windows vis-à-vis de NTLM :</p>
 
 <ol>
-  <li>
-    <p><strong>Privilégier Kerberos à NTLM</strong> : Kerberos est un protocole plus récent et plus sûr. Il ne transmet jamais les hashs sur le réseau et utilise des tickets à usage unique. Activez le pré-authentification Kerberos partout où c’est possible.</p>
-  </li>
-  <li>
-    <p><strong>Mettre en œuvre l’authentification protégée (Protected Users)</strong> : depuis Windows Server 2012 R2, on peut placer des utilisateurs sensibles dans le groupe “Protected Users”. Ils ne pourront alors plus s’authentifier en NTLM, uniquement en Kerberos.</p>
-  </li>
-  <li>
-    <p><strong>Restreindre NTLM au maximum</strong> : utilisez la stratégie de groupe “Network security: Restrict NTLM” pour limiter l’usage de NTLM au strict nécessaire. Passez les contrôleurs de domaine en mode “Deny all” et n’autorisez NTLM que pour les serveurs applicatifs qui en ont besoin.</p>
-  </li>
-  <li>
-    <p><strong>Surveiller les connexions NTLM</strong> : activez l’audit des connexions NTLM sur vos contrôleurs de domaine (via la stratégie “Account Logon”) et configurez des alertes sur les connexions anormales (compte de service depuis un poste utilisateur par exemple).</p>
-  </li>
-  <li>
-    <p><strong>Sensibiliser vos utilisateurs</strong> : comme souvent, l’humain est le maillon faible. Une campagne de sensibilisation sur l’importance des mots de passe robustes et uniques, combinée à une solution de gestion des accès privilégiés (PAM) réduira considérablement votre surface d’attaque.</p>
-  </li>
+  <li><strong>Privilégier Kerberos à NTLM</strong> : Kerberos est un protocole plus récent et plus sûr. Il ne transmet jamais les hashs sur le réseau et utilise des tickets à usage unique. Activez le pré-authentification Kerberos partout où c’est possible.</li>
+  <li><strong>Mettre en œuvre l’authentification protégée (Protected Users)</strong> : depuis Windows Server 2012 R2, on peut placer des utilisateurs sensibles dans le groupe “Protected Users”. Ils ne pourront alors plus s’authentifier en NTLM, uniquement en Kerberos.</li>
+  <li><strong>Restreindre NTLM au maximum</strong> : utilisez la stratégie de groupe “Network security: Restrict NTLM” pour limiter l’usage de NTLM au strict nécessaire. Passez les contrôleurs de domaine en mode “Deny all” et n’autorisez NTLM que pour les serveurs applicatifs qui en ont besoin.</li>
+  <li><strong>Surveiller les connexions NTLM</strong> : activez l’audit des connexions NTLM sur vos contrôleurs de domaine (via la stratégie “Account Logon”) et configurez des alertes sur les connexions anormales (compte de service depuis un poste utilisateur par exemple).</li>
+  <li><strong>Sensibiliser vos utilisateurs</strong> : comme souvent, l’humain est le maillon faible. Une campagne de sensibilisation sur l’importance des mots de passe robustes et uniques, combinée à une solution de gestion des accès privilégiés (PAM) réduira considérablement votre surface d’attaque.</li>
 </ol>
-
-<p>En appliquant ces bonnes pratiques, un grand groupe industriel français a réussi à réduire de 80% ses flux NTLM en 6 mois. Les attaques Pass-the-Hash détectées sont passées de 10 par semaine à moins de 1 par mois.</p>
 
 <h2 id="5-vers-un-monde-sans-ntlm-">5. Vers un monde sans NTLM ?</h2>
 
