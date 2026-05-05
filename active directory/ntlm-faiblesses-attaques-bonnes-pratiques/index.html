@@ -1,0 +1,281 @@
+
+
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.28.0 by Michael Rose
+  Copyright 2013-2026 Michael Rose - mademistakes.com | @mmistakes
+  Copyright 2024-2026 iBug - ibugone.com | @iBug
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+
+<html lang="fr-FR" class="no-js" dir="ltr">
+  <head>
+    
+<meta charset="utf-8">
+
+
+<!-- begin _includes/seo.html --><title>CNTLM : faiblesses, attaques et bonnes pratiques - Blog Cyber de Haroun</title>
+<meta name="description" content="NTLM est un protocole d’authentification largement utilisé dans les environnements Windows. Malheureusement, il souffre de faiblesses intrinsèques qui le rendent vulnérable à des attaques comme le Pass-the-Hash. Découvrez comment ça marche et surtout comment s’en prémunir.">
+
+
+  <meta name="author" content="Haroun MAHAMAT">
+  
+  <meta property="article:author" content="Haroun MAHAMAT">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Blog Cyber de Haroun">
+<meta property="og:title" content="CNTLM : faiblesses, attaques et bonnes pratiques">
+<meta property="og:url" content="https://hourso.github.io/active%20directory/ntlm-faiblesses-attaques-bonnes-pratiques/">
+
+
+  <meta property="og:description" content="NTLM est un protocole d’authentification largement utilisé dans les environnements Windows. Malheureusement, il souffre de faiblesses intrinsèques qui le rendent vulnérable à des attaques comme le Pass-the-Hash. Découvrez comment ça marche et surtout comment s’en prémunir.">
+
+
+
+  <meta property="og:image" content="https://hourso.github.io/assets/images/Ntlm/ntlm-teaser.jpg">
+  
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2026-05-02T00:00:00+00:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://hourso.github.io/active%20directory/ntlm-faiblesses-attaques-bonnes-pratiques/">
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Blog Cyber de Haroun Feed">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--default">
+    
+<nav class="skip-links" aria-label="Skip links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav" aria-label="Primary navigation">
+        
+        <a class="site-title" href="/">
+          Blog Cyber de Haroun
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a
+                href="/"
+                
+                
+              >Accueil</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/year-archive/"
+                
+                
+              >Articles</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/categories/"
+                
+                
+              >Catégories</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/about/"
+                
+                
+              >À propos</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      <p>NTLM (NT LAN Manager) est un protocole d’authentification utilisé principalement dans les environnements Microsoft Windows. Malgré son ancienneté et ses faiblesses connues, il reste très répandu, souvent pour des raisons de compatibilité.</p>
+
+<p>L’une des principales vulnérabilités de NTLM est sa sensibilité à l’attaque “Pass-the-Hash” (PtH). Comprendre son fonctionnement est essentiel pour tout administrateur système ou expert en cybersécurité confronté à des environnements Windows.</p>
+
+<h2 id="1-quest-ce-que-ntlm-">1. Qu’est-ce que NTLM ?</h2>
+
+<p>NTLM est un protocole d’authentification réseau créé par Microsoft. Il permet à un client de prouver son identité auprès d’un serveur, en utilisant un mécanisme de challenge-réponse basé sur un secret partagé : le hash du mot de passe de l’utilisateur.</p>
+
+<p>Voici un schéma simplifié d’une authentification NTLM :</p>
+
+<p><img src="/assets/images/ntlm-auth.png" alt="Schéma d'une authentification NTLM" /></p>
+
+<ol>
+  <li>Le client envoie une requête d’authentification au serveur</li>
+  <li>Le serveur répond avec un challenge (une valeur aléatoire)</li>
+  <li>Le client chiffre ce challenge avec le hash de son mot de passe et le renvoie au serveur</li>
+  <li>Le serveur déchiffre la réponse avec le hash stocké dans sa base SAM et compare les résultats</li>
+</ol>
+
+<p>Si les valeurs correspondent, l’authentification est réussie.</p>
+
+<h2 id="2-la-faiblesse-de-ntlm--les-hashs">2. La faiblesse de NTLM : les hashs</h2>
+
+<p>Le principal problème de NTLM réside dans sa gestion des hashs de mot de passe. En effet, pour des raisons de performances et de rétrocompatibilité, les hashs NTLM des utilisateurs sont stockés en clair dans la base SAM (Security Account Manager) de chaque poste Windows.</p>
+
+<p>Un attaquant qui parviendrait à extraire ces hashs (via une compromission locale ou une technique comme le DCSync) pourrait alors les réutiliser pour s’authentifier sans connaître le mot de passe en clair. C’est le principe du Pass-the-Hash.</p>
+
+<p><img src="/assets/images/pass-the-hash.jpg" alt="Le principe du Pass-the-Hash" /></p>
+
+<p>Avec des outils comme Mimikatz, un attaquant peut injecter un hash volé dans la mémoire d’un processus pour usurper une session. Et comme NTLM ne vérifie que la validité du hash, pas sa provenance, l’authentification réussira.</p>
+
+<h2 id="3-les-attaques-visant-ntlm">3. Les attaques visant NTLM</h2>
+
+<p>Au-delà du Pass-the-Hash, NTLM est vulnérable à d’autres types d’attaques :</p>
+
+<ul>
+  <li>
+    <p><strong>L’empoisonnement NTLM (NTLM Relay)</strong> : un attaquant intercepte une authentification NTLM et la rejoue vers un autre serveur pour accéder à des ressources en se faisant passer pour l’utilisateur légitime.</p>
+  </li>
+  <li>
+    <p><strong>L’abaissement NTLM (NTLM Downgrade)</strong> : un attaquant force l’utilisation de NTLMv1 (moins sécurisé) au lieu de NTLMv2 en manipulant les paramètres de négociation.</p>
+  </li>
+  <li>
+    <p><strong>L’attaque de l’homme du milieu (NTLM MitM)</strong> : en se positionnant entre le client et le serveur (sur un point d’accès WiFi compromis par exemple), un attaquant peut capturer des hashs NTLM et tenter de les cracker offline.</p>
+  </li>
+</ul>
+
+<p>En 2021 par exemple, le groupe Hafnium a exploité des vulnérabilités Exchange pour déployer des web shells et voler des hashs NTLM via le canal HTTP. Ces hashs ont ensuite permis des mouvements latéraux et des élévations de privilèges.</p>
+
+<h2 id="4-durcir-ntlm--les-bonnes-pratiques">4. Durcir NTLM : les bonnes pratiques</h2>
+
+<p>Heureusement, il existe plusieurs moyens de se prémunir contre ces attaques et de durcir son environnement Windows vis-à-vis de NTLM :</p>
+
+<ol>
+  <li>
+    <p><strong>Privilégier Kerberos à NTLM</strong> : Kerberos est un protocole plus récent et plus sûr. Il ne transmet jamais les hashs sur le réseau et utilise des tickets à usage unique. Activez le pré-authentification Kerberos partout où c’est possible.</p>
+  </li>
+  <li>
+    <p><strong>Mettre en œuvre l’authentification protégée (Protected Users)</strong> : depuis Windows Server 2012 R2, on peut placer des utilisateurs sensibles dans le groupe “Protected Users”. Ils ne pourront alors plus s’authentifier en NTLM, uniquement en Kerberos.</p>
+  </li>
+  <li>
+    <p><strong>Restreindre NTLM au maximum</strong> : utilisez la stratégie de groupe “Network security: Restrict NTLM” pour limiter l’usage de NTLM au strict nécessaire. Passez les contrôleurs de domaine en mode “Deny all” et n’autorisez NTLM que pour les serveurs applicatifs qui en ont besoin.</p>
+  </li>
+  <li>
+    <p><strong>Surveiller les connexions NTLM</strong> : activez l’audit des connexions NTLM sur vos contrôleurs de domaine (via la stratégie “Account Logon”) et configurez des alertes sur les connexions anormales (compte de service depuis un poste utilisateur par exemple).</p>
+  </li>
+  <li>
+    <p><strong>Sensibiliser vos utilisateurs</strong> : comme souvent, l’humain est le maillon faible. Une campagne de sensibilisation sur l’importance des mots de passe robustes et uniques, combinée à une solution de gestion des accès privilégiés (PAM) réduira considérablement votre surface d’attaque.</p>
+  </li>
+</ol>
+
+<p>En appliquant ces bonnes pratiques, un grand groupe industriel français a réussi à réduire de 80% ses flux NTLM en 6 mois. Les attaques Pass-the-Hash détectées sont passées de 10 par semaine à moins de 1 par mois.</p>
+
+<h2 id="5-vers-un-monde-sans-ntlm-">5. Vers un monde sans NTLM ?</h2>
+
+<p>Microsoft l’a annoncé : NTLM est obsolète et sera progressivement déprécié dans les versions futures de Windows. D’ailleurs, depuis Windows 10 1903, NTLM n’est plus activé par défaut sur le réseau local.</p>
+
+<p>Mais en attendant ce monde idéal, il est crucial de comprendre et de maîtriser ce protocole, tant il reste omniprésent dans les SI. En combinant durcissement technique et sensibilisation, vous pouvez dès à présent réduire significativement les risques liés à NTLM.</p>
+
+<p>J’espère que cet article vous y aura aidé ! N’hésitez pas à partager vos retours d’expérience en commentaire. Si vous avez réussi à bannir NTLM de votre SI, je suis preneur de vos conseils.</p>
+
+      
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        
+
+
+<div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-square-rss" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+
+<div class="page__footer-copyright">&copy; 2026 <a href="https://hourso.github.io">Blog Cyber de Haroun</a>. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/jekyll-themes/minimal-mistakes/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
