@@ -200,389 +200,210 @@ L’idée centrale : <strong>tu tapes ton mot de passe une seule fois</strong> (
     <p>Concrètement, une authentification Kerberos se fait en <strong>3 paires de messages</strong> :
 ##<img src="/assets/images/Kerberos/kerberos-flow.svg" alt="Flux d'authentification Kerberos" />
 <em>Les 6 échanges de Kerberos entre le client, le KDC et le service</em></p>
+    <h4 id="étape-1--as-req--as-rep-lauthentification-initiale">Étape 1 : AS-REQ / AS-REP (l’authentification initiale)</h4>
+    <p><strong>AS-REQ</strong> : Le client envoie au KDC : <em>“Je suis Alice, je veux un TGT”</em>. Pour prouver qu’il est bien Alice, il joint un <strong>timestamp chiffré avec le hash de son mot de passe</strong>. C’est ce qu’on appelle la <strong>pré-authentification</strong>.
+<strong>AS-REP</strong> : Le KDC déchiffre le timestamp avec le hash du mot de passe d’Alice (qu’il connaît, puisqu’il est stocké dans Active Directory). Si ça marche, c’est qu’Alice est bien Alice. Le KDC répond avec :</p>
   </li>
-</ul>
-
-<h4 id="étape-1--as-req--as-rep-lauthentification-initiale">Étape 1 : AS-REQ / AS-REP (l’authentification initiale)</h4>
-
-<p><strong>AS-REQ</strong> : Le client envoie au KDC : <em>“Je suis Alice, je veux un TGT”</em>. Pour prouver qu’il est bien Alice, il joint un <strong>timestamp chiffré avec le hash de son mot de passe</strong>. C’est ce qu’on appelle la <strong>pré-authentification</strong>.</p>
-
-<p><strong>AS-REP</strong> : Le KDC déchiffre le timestamp avec le hash du mot de passe d’Alice (qu’il connaît, puisqu’il est stocké dans Active Directory). Si ça marche, c’est qu’Alice est bien Alice. Le KDC répond avec :</p>
-<ul>
   <li>Une <strong>clé de session</strong> (chiffrée avec le hash d’Alice, donc seule elle peut la lire).</li>
-  <li>Un <strong>TGT</strong> (chiffré avec la clé secrète du KDC, qu’Alice ne peut pas lire mais qu’elle pourra présenter).</li>
-</ul>
-
-<blockquote>
-  <p>💡 Le TGT est en fait chiffré avec le hash d’un compte spécial : <strong>krbtgt</strong>. Retiens ce nom, il reviendra dans les attaques.</p>
-</blockquote>
-
-<h4 id="étape-2--tgs-req--tgs-rep-la-demande-daccès-à-un-service">Étape 2 : TGS-REQ / TGS-REP (la demande d’accès à un service)</h4>
-
-<p>Alice veut maintenant accéder au serveur de fichiers <code class="language-plaintext highlighter-rouge">\\FILESRV01</code>.</p>
-
-<p><strong>TGS-REQ</strong> : Alice envoie au KDC : <em>“Voici mon TGT, je veux un ticket pour le service CIFS/FILESRV01”</em>. Elle s’identifie avec un authentificateur chiffré avec la clé de session.</p>
-
-<p><strong>TGS-REP</strong> : Le KDC vérifie le TGT, et répond avec :</p>
-<ul>
+  <li>Un <strong>TGT</strong> (chiffré avec la clé secrète du KDC, qu’Alice ne peut pas lire mais qu’elle pourra présenter).
+    <blockquote>
+      <p>💡 Le TGT est en fait chiffré avec le hash d’un compte spécial : <strong>krbtgt</strong>. Retiens ce nom, il reviendra dans les attaques.</p>
+      <h4 id="étape-2--tgs-req--tgs-rep-la-demande-daccès-à-un-service">Étape 2 : TGS-REQ / TGS-REP (la demande d’accès à un service)</h4>
+      <p>Alice veut maintenant accéder au serveur de fichiers <code class="language-plaintext highlighter-rouge">\\FILESRV01</code>.
+<strong>TGS-REQ</strong> : Alice envoie au KDC : <em>“Voici mon TGT, je veux un ticket pour le service CIFS/FILESRV01”</em>. Elle s’identifie avec un authentificateur chiffré avec la clé de session.
+<strong>TGS-REP</strong> : Le KDC vérifie le TGT, et répond avec :</p>
+    </blockquote>
+  </li>
   <li>Une nouvelle <strong>clé de session</strong> pour parler avec le service.</li>
-  <li>Un <strong>TGS</strong> (ticket de service), chiffré avec <strong>le hash du mot de passe du compte de service</strong> associé à FILESRV01.</li>
-</ul>
-
-<blockquote>
-  <p>💡 Retiens bien ça : <strong>le TGS est chiffré avec le mot de passe du compte de service</strong>. C’est exactement ce qu’exploite le Kerberoasting.</p>
-</blockquote>
-
-<h4 id="étape-3--ap-req--ap-rep-laccès-au-service">Étape 3 : AP-REQ / AP-REP (l’accès au service)</h4>
-
-<p><strong>AP-REQ</strong> : Alice présente son TGS au serveur de fichiers.</p>
-
-<p><strong>AP-REP</strong> : Le serveur déchiffre le TGS avec son propre hash, vérifie que tout est cohérent, et donne accès. Optionnellement, il répond pour s’authentifier mutuellement.</p>
-
-<hr />
-
-<h2 id="3-pourquoi-kerberos-est-meilleur-que-les-autres-méthodes-">3. Pourquoi Kerberos est meilleur que les autres méthodes ?</h2>
-
-<p>Pour comprendre la valeur de Kerberos, comparons-le à ses prédécesseurs et alternatives.</p>
-
-<h3 id="vs-authentification-basique-loginmot-de-passe-à-chaque-service">Vs authentification basique (login/mot de passe à chaque service)</h3>
-
-<p>Avec une auth basique, le mot de passe transite à chaque connexion. Si un attaquant écoute le réseau, il récupère le mot de passe en clair (ou un hash facilement rejouable).</p>
-
-<p><strong>Avec Kerberos</strong> : le mot de passe ne transite <strong>jamais</strong> sur le réseau. Seuls des tickets temporaires circulent. Même si tu captures tout le trafic, tu n’auras pas le mot de passe.</p>
-
-<h3 id="vs-ntlm-le-prédécesseur-microsoft">Vs NTLM (le prédécesseur Microsoft)</h3>
-
-<p>NTLM est l’ancien protocole d’authentification Windows. Il fonctionne en <strong>challenge/response</strong> : le serveur envoie un défi, le client le chiffre avec son hash, le serveur valide.</p>
-
-<p>Problèmes de NTLM :</p>
-<ul>
+  <li>Un <strong>TGS</strong> (ticket de service), chiffré avec <strong>le hash du mot de passe du compte de service</strong> associé à FILESRV01.
+    <blockquote>
+      <p>💡 Retiens bien ça : <strong>le TGS est chiffré avec le mot de passe du compte de service</strong>. C’est exactement ce qu’exploite le Kerberoasting.</p>
+      <h4 id="étape-3--ap-req--ap-rep-laccès-au-service">Étape 3 : AP-REQ / AP-REP (l’accès au service)</h4>
+      <p><strong>AP-REQ</strong> : Alice présente son TGS au serveur de fichiers.
+<strong>AP-REP</strong> : Le serveur déchiffre le TGS avec son propre hash, vérifie que tout est cohérent, et donne accès. Optionnellement, il répond pour s’authentifier mutuellement.
+—</p>
+      <h2 id="3-pourquoi-kerberos-est-meilleur-que-les-autres-méthodes-">3. Pourquoi Kerberos est meilleur que les autres méthodes ?</h2>
+      <p>Pour comprendre la valeur de Kerberos, comparons-le à ses prédécesseurs et alternatives.</p>
+      <h3 id="vs-authentification-basique-loginmot-de-passe-à-chaque-service">Vs authentification basique (login/mot de passe à chaque service)</h3>
+      <p>Avec une auth basique, le mot de passe transite à chaque connexion. Si un attaquant écoute le réseau, il récupère le mot de passe en clair (ou un hash facilement rejouable).
+<strong>Avec Kerberos</strong> : le mot de passe ne transite <strong>jamais</strong> sur le réseau. Seuls des tickets temporaires circulent. Même si tu captures tout le trafic, tu n’auras pas le mot de passe.</p>
+      <h3 id="vs-ntlm-le-prédécesseur-microsoft">Vs NTLM (le prédécesseur Microsoft)</h3>
+      <p>NTLM est l’ancien protocole d’authentification Windows. Il fonctionne en <strong>challenge/response</strong> : le serveur envoie un défi, le client le chiffre avec son hash, le serveur valide.
+Problèmes de NTLM :</p>
+    </blockquote>
+  </li>
   <li><strong>Vulnérable au pass-the-hash</strong> : si tu voles le hash NTLM, tu peux t’authentifier sans connaître le mot de passe.</li>
   <li><strong>Vulnérable au relais NTLM</strong> : un attaquant peut intercepter le challenge et le rejouer ailleurs.</li>
   <li><strong>Pas d’authentification mutuelle</strong> : le client ne vérifie pas l’identité du serveur.</li>
-  <li><strong>Algorithmes cryptographiques faibles</strong> (MD4 dans NTLMv1).</li>
-</ul>
-
-<p><strong>Avec Kerberos</strong> :</p>
-<ul>
+  <li><strong>Algorithmes cryptographiques faibles</strong> (MD4 dans NTLMv1).
+<strong>Avec Kerberos</strong> :</li>
   <li><strong>Authentification mutuelle</strong> possible : le client peut vérifier que le serveur est légitime.</li>
   <li><strong>Tickets avec durée de vie limitée</strong> (typiquement 10h pour un TGT).</li>
   <li><strong>Pas de mot de passe ni de hash transitant</strong>.</li>
-  <li><strong>Algorithmes modernes</strong> (AES-256 par défaut depuis Windows 7/2008 R2).</li>
-</ul>
-
-<h3 id="vs-ldap-simple-bind">Vs LDAP simple bind</h3>
-
-<p>Avec un bind LDAP, tu envoies ton mot de passe (en clair sans LDAPS) au serveur LDAP. Aucune comparaison possible avec Kerberos sur le plan sécurité.</p>
-
-<h3 id="le-sso-comme-bonus">Le SSO comme bonus</h3>
-
-<p>Avec Kerberos, <strong>tu tapes ton mot de passe une fois au login</strong>, et ensuite tu peux accéder à tous les services du domaine sans le retaper. C’est le <strong>Single Sign-On</strong>, et ce n’est pas qu’un confort utilisateur : c’est aussi moins de surface d’attaque (moins de saisies, moins de risques de phishing).</p>
-
-<hr />
-
-<h2 id="4-les-attaques-contre-kerberos">4. Les attaques contre Kerberos</h2>
-
-<p>OK, Kerberos c’est solide sur le papier. Mais alors pourquoi on en parle autant côté offensif ?</p>
-
-<p>Parce que <strong>les implémentations et les usages opérationnels créent des failles</strong>. Voici les 4 attaques majeures que tout défenseur doit connaître.</p>
-
-<p><img src="/assets/images/Kerberos/kerberos-attaques.svg" alt="Panorama des attaques Kerberos" />
+  <li><strong>Algorithmes modernes</strong> (AES-256 par défaut depuis Windows 7/2008 R2).
+    <h3 id="vs-ldap-simple-bind">Vs LDAP simple bind</h3>
+    <p>Avec un bind LDAP, tu envoies ton mot de passe (en clair sans LDAPS) au serveur LDAP. Aucune comparaison possible avec Kerberos sur le plan sécurité.</p>
+    <h3 id="le-sso-comme-bonus">Le SSO comme bonus</h3>
+    <p>Avec Kerberos, <strong>tu tapes ton mot de passe une fois au login</strong>, et ensuite tu peux accéder à tous les services du domaine sans le retaper. C’est le <strong>Single Sign-On</strong>, et ce n’est pas qu’un confort utilisateur : c’est aussi moins de surface d’attaque (moins de saisies, moins de risques de phishing).
+—</p>
+    <h2 id="4-les-attaques-contre-kerberos">4. Les attaques contre Kerberos</h2>
+    <p>OK, Kerberos c’est solide sur le papier. Mais alors pourquoi on en parle autant côté offensif ?
+Parce que <strong>les implémentations et les usages opérationnels créent des failles</strong>. Voici les 4 attaques majeures que tout défenseur doit connaître.
+<img src="/assets/images/Kerberos/kerberos-attaques.svg" alt="Panorama des attaques Kerberos" />
 <em>Les 4 attaques majeures et leur point d’impact dans le flux Kerberos</em></p>
-
-<h3 id="41-kerberoasting">4.1 Kerberoasting</h3>
-
-<p><strong>Principe</strong> : Un attaquant <strong>déjà authentifié</strong> dans le domaine (un simple compte utilisateur suffit) demande des tickets de service (TGS) pour des comptes ayant un <strong>SPN</strong> (<em>Service Principal Name</em>). Comme on l’a vu, le TGS est chiffré avec le hash du mot de passe du compte de service. L’attaquant <strong>extrait ce ticket et tente de cracker le hash hors ligne</strong>.</p>
-
-<p><strong>Pourquoi c’est dangereux</strong> :</p>
-<ul>
+    <h3 id="41-kerberoasting">4.1 Kerberoasting</h3>
+    <p><strong>Principe</strong> : Un attaquant <strong>déjà authentifié</strong> dans le domaine (un simple compte utilisateur suffit) demande des tickets de service (TGS) pour des comptes ayant un <strong>SPN</strong> (<em>Service Principal Name</em>). Comme on l’a vu, le TGS est chiffré avec le hash du mot de passe du compte de service. L’attaquant <strong>extrait ce ticket et tente de cracker le hash hors ligne</strong>.
+<strong>Pourquoi c’est dangereux</strong> :</p>
+  </li>
   <li>N’importe quel utilisateur du domaine peut faire la requête (c’est un comportement légitime de Kerberos).</li>
   <li>Le crack se fait <strong>hors ligne</strong> : aucun risque de verrouillage de compte, aucune trace réseau pendant le crack.</li>
   <li>Beaucoup de comptes de service ont des mots de passe <strong>faibles ou anciens</strong> (créés il y a 10 ans, jamais changés).</li>
-  <li>Si le compte est admin du domaine (ce qui arrive souvent par négligence), c’est game over.</li>
-</ul>
-
-<p><strong>Anecdote récente</strong> : en septembre 2025, le sénateur américain Ron Wyden a publiquement reproché à Microsoft sa “négligence cybersécurité” suite à la compromission par ransomware d’<strong>Ascension</strong> (géant de la santé US) en 2024, dont le vecteur principal était… le Kerberoasting.</p>
-
-<p><strong>Remédiation</strong> :</p>
-<ul>
+  <li>Si le compte est admin du domaine (ce qui arrive souvent par négligence), c’est game over.
+<strong>Anecdote récente</strong> : en septembre 2025, le sénateur américain Ron Wyden a publiquement reproché à Microsoft sa “négligence cybersécurité” suite à la compromission par ransomware d’<strong>Ascension</strong> (géant de la santé US) en 2024, dont le vecteur principal était… le Kerberoasting.
+<strong>Remédiation</strong> :</li>
   <li>Utiliser des <strong>gMSA</strong> (<em>Group Managed Service Accounts</em>) : mots de passe gérés automatiquement par AD, longueur 240 caractères, rotation tous les 30 jours.</li>
   <li>Si gMSA impossible : mots de passe <strong>longs et complexes</strong> (&gt;25 caractères) sur les comptes de service.</li>
   <li><strong>Désactiver RC4</strong> (forcer AES) : RC4 se crack beaucoup plus vite que AES.</li>
   <li><strong>Audit régulier</strong> des comptes avec SPN et privilèges associés.</li>
-  <li><strong>Aucun compte de service ne doit être admin du domaine</strong>.</li>
-</ul>
-
-<h3 id="42-as-rep-roasting">4.2 AS-REP Roasting</h3>
-
-<p><strong>Principe</strong> : Si un compte a l’attribut <code class="language-plaintext highlighter-rouge">DONT_REQ_PREAUTH</code> (<em>Do not require Kerberos preauthentication</em>), n’importe qui peut envoyer une AS-REQ pour ce compte sans prouver d’identité. Le KDC répondra avec une AS-REP contenant des données chiffrées avec le hash du mot de passe de l’utilisateur. Cracking offline.</p>
-
-<p><strong>Différence avec Kerberoasting</strong> : pas besoin d’être authentifié dans le domaine. Il suffit de connaître un nom d’utilisateur valide.</p>
-
-<p><strong>Pourquoi ça arrive en prod</strong> : un dev a désactivé la pré-auth pour une vieille appli incompatible, “temporairement”… et on l’a oublié. Il y a des cas documentés où la config est restée 2 ans.</p>
-
-<p><strong>Remédiation</strong> :</p>
-<ul>
+  <li><strong>Aucun compte de service ne doit être admin du domaine</strong>.
+    <h3 id="42-as-rep-roasting">4.2 AS-REP Roasting</h3>
+    <p><strong>Principe</strong> : Si un compte a l’attribut <code class="language-plaintext highlighter-rouge">DONT_REQ_PREAUTH</code> (<em>Do not require Kerberos preauthentication</em>), n’importe qui peut envoyer une AS-REQ pour ce compte sans prouver d’identité. Le KDC répondra avec une AS-REP contenant des données chiffrées avec le hash du mot de passe de l’utilisateur. Cracking offline.
+<strong>Différence avec Kerberoasting</strong> : pas besoin d’être authentifié dans le domaine. Il suffit de connaître un nom d’utilisateur valide.
+<strong>Pourquoi ça arrive en prod</strong> : un dev a désactivé la pré-auth pour une vieille appli incompatible, “temporairement”… et on l’a oublié. Il y a des cas documentés où la config est restée 2 ans.
+<strong>Remédiation</strong> :</p>
+  </li>
   <li><strong>Auditer</strong> régulièrement les comptes avec <code class="language-plaintext highlighter-rouge">DONT_REQ_PREAUTH</code> (requête PowerShell : <code class="language-plaintext highlighter-rouge">Get-ADUser -Filter {DoesNotRequirePreAuth -eq $true}</code>).</li>
   <li><strong>Réactiver la pré-authentification</strong> partout où c’est possible.</li>
-  <li>Mots de passe forts sur les comptes restants.</li>
-</ul>
-
-<h3 id="43-golden-ticket">4.3 Golden Ticket</h3>
-
-<p><strong>Principe</strong> : C’est le saint Graal de l’attaquant. Si tu mets la main sur le <strong>hash du compte krbtgt</strong>, tu peux <strong>forger toi-même n’importe quel TGT</strong> pour n’importe quel utilisateur, avec n’importe quels privilèges, valable jusqu’à 10 ans par défaut.</p>
-
-<p>Souviens-toi : le TGT est chiffré avec le hash de krbtgt. Si tu connais ce hash, tu deviens littéralement le KDC.</p>
-
-<p><strong>Pourquoi c’est terrifiant</strong> :</p>
-<ul>
+  <li>Mots de passe forts sur les comptes restants.
+    <h3 id="43-golden-ticket">4.3 Golden Ticket</h3>
+    <p><strong>Principe</strong> : C’est le saint Graal de l’attaquant. Si tu mets la main sur le <strong>hash du compte krbtgt</strong>, tu peux <strong>forger toi-même n’importe quel TGT</strong> pour n’importe quel utilisateur, avec n’importe quels privilèges, valable jusqu’à 10 ans par défaut.
+Souviens-toi : le TGT est chiffré avec le hash de krbtgt. Si tu connais ce hash, tu deviens littéralement le KDC.
+<strong>Pourquoi c’est terrifiant</strong> :</p>
+  </li>
   <li><strong>Persistance ultime</strong> dans le domaine.</li>
   <li>Le ticket forgé est <strong>techniquement valide</strong> : le KDC ne peut pas faire la différence.</li>
-  <li>L’attaquant peut <strong>se faire passer pour un admin du domaine</strong> sans toucher à son mot de passe.</li>
-</ul>
-
-<p><strong>Prérequis pour l’attaque</strong> : avoir déjà compromis un contrôleur de domaine (donc l’attaquant est déjà <em>very</em> loin dans la kill chain). Le Golden Ticket sert surtout de <strong>mécanisme de persistance</strong>.</p>
-
-<p><strong>Remédiation</strong> :</p>
-<ul>
+  <li>L’attaquant peut <strong>se faire passer pour un admin du domaine</strong> sans toucher à son mot de passe.
+<strong>Prérequis pour l’attaque</strong> : avoir déjà compromis un contrôleur de domaine (donc l’attaquant est déjà <em>very</em> loin dans la kill chain). Le Golden Ticket sert surtout de <strong>mécanisme de persistance</strong>.
+<strong>Remédiation</strong> :</li>
   <li><strong>Changer le mot de passe de krbtgt deux fois</strong> (deux fois car il y a un historique de 2 versions). Microsoft fournit un script officiel pour ça.</li>
   <li><strong>Le faire régulièrement</strong> (tous les 6 à 12 mois minimum, ou immédiatement après tout incident).</li>
-  <li><strong>Protéger les contrôleurs de domaine</strong> comme la prunelle de tes yeux (Tier 0).</li>
-</ul>
-
-<h3 id="44-silver-ticket">4.4 Silver Ticket</h3>
-
-<p><strong>Principe</strong> : Même idée que le Golden Ticket, mais avec le hash d’un <strong>compte de service</strong> au lieu de krbtgt. L’attaquant forge un <strong>TGS</strong> valide pour ce service précis.</p>
-
-<p><strong>Différences avec le Golden Ticket</strong> :</p>
-<ul>
+  <li><strong>Protéger les contrôleurs de domaine</strong> comme la prunelle de tes yeux (Tier 0).
+    <h3 id="44-silver-ticket">4.4 Silver Ticket</h3>
+    <p><strong>Principe</strong> : Même idée que le Golden Ticket, mais avec le hash d’un <strong>compte de service</strong> au lieu de krbtgt. L’attaquant forge un <strong>TGS</strong> valide pour ce service précis.
+<strong>Différences avec le Golden Ticket</strong> :</p>
+  </li>
   <li>Plus limité : ne donne accès qu’à <strong>un seul service</strong>.</li>
-  <li>Plus furtif : le ticket forgé <strong>ne passe pas par le KDC</strong>. Donc <strong>aucun log côté DC</strong>.</li>
-</ul>
-
-<p><strong>Remédiation</strong> :</p>
-<ul>
+  <li>Plus furtif : le ticket forgé <strong>ne passe pas par le KDC</strong>. Donc <strong>aucun log côté DC</strong>.
+<strong>Remédiation</strong> :</li>
   <li>Mêmes principes que pour Kerberoasting : gMSA, mots de passe forts, AES, rotation.</li>
-  <li><strong>Activer la validation PAC</strong> côté serveurs (KERB_VALIDATE_CLIENT, vérification du PAC contre le KDC).</li>
-</ul>
-
-<h3 id="tableau-récap-des-attaques">Tableau récap des attaques</h3>
-
-<table>
-  <thead>
-    <tr>
-      <th>Attaque</th>
-      <th>Prérequis</th>
-      <th>Cible</th>
-      <th>Furtivité</th>
-      <th>Remédiation principale</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Kerberoasting</td>
-      <td>Compte AD valide</td>
-      <td>Hash compte service</td>
-      <td>Moyenne</td>
-      <td>gMSA, mots de passe forts</td>
-    </tr>
-    <tr>
-      <td>AS-REP Roasting</td>
-      <td>Nom d’utilisateur</td>
-      <td>Hash utilisateur</td>
-      <td>Élevée</td>
-      <td>Activer la pré-auth</td>
-    </tr>
-    <tr>
-      <td>Golden Ticket</td>
-      <td>Hash de krbtgt</td>
-      <td>Domaine entier</td>
-      <td>Très élevée</td>
-      <td>Rotation krbtgt × 2</td>
-    </tr>
-    <tr>
-      <td>Silver Ticket</td>
-      <td>Hash compte service</td>
-      <td>Service précis</td>
-      <td>Très élevée</td>
-      <td>gMSA, validation PAC</td>
-    </tr>
-  </tbody>
-</table>
-
-<hr />
-
-<h2 id="5-détection--comment-surveiller-kerberos-dans-un-soc">5. Détection : comment surveiller Kerberos dans un SOC</h2>
-
-<p>C’est là que ça devient intéressant côté blue team. Voici les <strong>événements Windows clés</strong> à surveiller (à activer côté contrôleurs de domaine via la GPO d’audit avancé).</p>
-
-<h3 id="les-event-id-essentiels">Les Event ID essentiels</h3>
-
-<table>
-  <thead>
-    <tr>
-      <th>Event ID</th>
-      <th>Source</th>
-      <th>Ce qu’il indique</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>4768</strong></td>
-      <td>Security</td>
-      <td>Demande de TGT (AS-REQ)</td>
-    </tr>
-    <tr>
-      <td><strong>4769</strong></td>
-      <td>Security</td>
-      <td>Demande de TGS (TGS-REQ)</td>
-    </tr>
-    <tr>
-      <td><strong>4770</strong></td>
-      <td>Security</td>
-      <td>Renouvellement de ticket</td>
-    </tr>
-    <tr>
-      <td><strong>4771</strong></td>
-      <td>Security</td>
-      <td>Échec de pré-authentification Kerberos</td>
-    </tr>
-    <tr>
-      <td><strong>4624</strong></td>
-      <td>Security</td>
-      <td>Login réussi (Logon Type 3 = réseau)</td>
-    </tr>
-    <tr>
-      <td><strong>4625</strong></td>
-      <td>Security</td>
-      <td>Échec de login</td>
-    </tr>
-  </tbody>
-</table>
-
-<h3 id="détecter-le-kerberoasting">Détecter le Kerberoasting</h3>
-
-<p><strong>Signal principal</strong> : le <strong>4769</strong> (demande de TGS) avec :</p>
-<ul>
+  <li><strong>Activer la validation PAC</strong> côté serveurs (KERB_VALIDATE_CLIENT, vérification du PAC contre le KDC).
+    <h3 id="tableau-récap-des-attaques">Tableau récap des attaques</h3>
+    <p>| Attaque          | Prérequis                  | Cible                | Furtivité | Remédiation principale       |
+|——————|—————————-|———————-|———–|——————————|
+| Kerberoasting    | Compte AD valide           | Hash compte service  | Moyenne   | gMSA, mots de passe forts    |
+| AS-REP Roasting  | Nom d’utilisateur          | Hash utilisateur     | Élevée    | Activer la pré-auth          |
+| Golden Ticket    | Hash de krbtgt             | Domaine entier       | Très élevée | Rotation krbtgt × 2         |
+| Silver Ticket    | Hash compte service        | Service précis       | Très élevée | gMSA, validation PAC         |
+—</p>
+    <h2 id="5-détection--comment-surveiller-kerberos-dans-un-soc">5. Détection : comment surveiller Kerberos dans un SOC</h2>
+    <p>C’est là que ça devient intéressant côté blue team. Voici les <strong>événements Windows clés</strong> à surveiller (à activer côté contrôleurs de domaine via la GPO d’audit avancé).</p>
+    <h3 id="les-event-id-essentiels">Les Event ID essentiels</h3>
+    <p>| Event ID | Source | Ce qu’il indique |
+|———-|——–|——————|
+| <strong>4768</strong> | Security | Demande de TGT (AS-REQ) |
+| <strong>4769</strong> | Security | Demande de TGS (TGS-REQ) |
+| <strong>4770</strong> | Security | Renouvellement de ticket |
+| <strong>4771</strong> | Security | Échec de pré-authentification Kerberos |
+| <strong>4624</strong> | Security | Login réussi (Logon Type 3 = réseau) |
+| <strong>4625</strong> | Security | Échec de login |</p>
+    <h3 id="détecter-le-kerberoasting">Détecter le Kerberoasting</h3>
+    <p><strong>Signal principal</strong> : le <strong>4769</strong> (demande de TGS) avec :</p>
+  </li>
   <li><code class="language-plaintext highlighter-rouge">Ticket Encryption Type = 0x17</code> (RC4-HMAC) → suspect car AES est le défaut moderne.</li>
   <li>Un utilisateur qui demande <strong>un grand nombre de TGS</strong> pour différents SPN en peu de temps.</li>
-  <li>Demandes de TGS pour des comptes de service à privilèges élevés.</li>
-</ul>
-
-<p><strong>Règle de détection (pseudo-Sigma)</strong> :</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">detection</span><span class="pi">:</span>
-  <span class="na">selection</span><span class="pi">:</span>
-    <span class="na">EventID</span><span class="pi">:</span> <span class="m">4769</span>
-    <span class="na">TicketEncryptionType</span><span class="pi">:</span> <span class="s1">'</span><span class="s">0x17'</span>
-    <span class="na">ServiceName|endswith</span><span class="pi">:</span> <span class="s1">'</span><span class="s">$'</span>  <span class="c1"># exclure les comptes machine</span>
-  <span class="na">timeframe</span><span class="pi">:</span> <span class="s">5m</span>
-  <span class="na">condition</span><span class="pi">:</span> <span class="s">selection | count(ServiceName) by AccountName &gt; </span><span class="m">10</span>
-</code></pre></div></div>
-
-<p><strong>Indicateurs comportementaux</strong> :</p>
-<ul>
+  <li>Demandes de TGS pour des comptes de service à privilèges élevés.
+<strong>Règle de détection (pseudo-Sigma)</strong> :
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">detection</span><span class="pi">:</span>
+<span class="na">selection</span><span class="pi">:</span>
+  <span class="na">EventID</span><span class="pi">:</span> <span class="m">4769</span>
+  <span class="na">TicketEncryptionType</span><span class="pi">:</span> <span class="s1">'</span><span class="s">0x17'</span>
+  <span class="na">ServiceName|endswith</span><span class="pi">:</span> <span class="s1">'</span><span class="s">$'</span>  <span class="c1"># exclure les comptes machine</span>
+<span class="na">timeframe</span><span class="pi">:</span> <span class="s">5m</span>
+<span class="na">condition</span><span class="pi">:</span> <span class="s">selection | count(ServiceName) by AccountName &gt; </span><span class="m">10</span>
+</code></pre></div>    </div>
+    <p><strong>Indicateurs comportementaux</strong> :</p>
+  </li>
   <li>Compte utilisateur lambda demandant des TGS pour 50 services différents en 2 minutes → suspect.</li>
-  <li>Outils utilisés : Rubeus, GetUserSPNs.py (Impacket), PowerView.</li>
-</ul>
-
-<h3 id="détecter-las-rep-roasting">Détecter l’AS-REP Roasting</h3>
-
-<p><strong>Signal principal</strong> : le <strong>4768</strong> avec :</p>
-<ul>
+  <li>Outils utilisés : Rubeus, GetUserSPNs.py (Impacket), PowerView.
+    <h3 id="détecter-las-rep-roasting">Détecter l’AS-REP Roasting</h3>
+    <p><strong>Signal principal</strong> : le <strong>4768</strong> avec :</p>
+  </li>
   <li><code class="language-plaintext highlighter-rouge">Pre-Authentication Type = 0</code> (pas de pré-auth).</li>
   <li><code class="language-plaintext highlighter-rouge">Encryption Type = 0x17</code> (RC4).</li>
-  <li>Volume anormal d’AS-REQ pour différents utilisateurs depuis la même source.</li>
-</ul>
-
-<p><strong>Détection préventive</strong> : auditer la présence de comptes avec <code class="language-plaintext highlighter-rouge">DONT_REQ_PREAUTH</code> :</p>
-<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-ADUser</span><span class="w"> </span><span class="nt">-Filter</span><span class="w"> </span><span class="p">{</span><span class="n">DoesNotRequirePreAuth</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="bp">$true</span><span class="p">}</span><span class="w"> </span><span class="nt">-Properties</span><span class="w"> </span><span class="n">DoesNotRequirePreAuth</span><span class="w">
-</span></code></pre></div></div>
-
-<h3 id="détecter-le-golden-ticket">Détecter le Golden Ticket</h3>
-
-<p>C’est le <strong>plus dur à détecter</strong>, parce que le ticket est cryptographiquement valide. Mais il y a des <strong>anomalies</strong> caractéristiques :</p>
-
-<ul>
+  <li>Volume anormal d’AS-REQ pour différents utilisateurs depuis la même source.
+<strong>Détection préventive</strong> : auditer la présence de comptes avec <code class="language-plaintext highlighter-rouge">DONT_REQ_PREAUTH</code> :
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Get-ADUser</span><span class="w"> </span><span class="nt">-Filter</span><span class="w"> </span><span class="p">{</span><span class="n">DoesNotRequirePreAuth</span><span class="w"> </span><span class="o">-eq</span><span class="w"> </span><span class="bp">$true</span><span class="p">}</span><span class="w"> </span><span class="nt">-Properties</span><span class="w"> </span><span class="n">DoesNotRequirePreAuth</span><span class="w">
+</span></code></pre></div>    </div>
+    <h3 id="détecter-le-golden-ticket">Détecter le Golden Ticket</h3>
+    <p>C’est le <strong>plus dur à détecter</strong>, parce que le ticket est cryptographiquement valide. Mais il y a des <strong>anomalies</strong> caractéristiques :</p>
+  </li>
   <li><strong>TGS-REQ (4769) sans 4768 préalable</strong> : un utilisateur demande un TGS sans avoir demandé de TGT au préalable. Anomalie majeure.</li>
   <li><strong>Durée de vie anormale du ticket</strong> : par défaut Mimikatz forge des tickets de 10 ans.</li>
   <li><strong>Champs invalides dans le PAC</strong> : SID ou nom d’utilisateur incohérents.</li>
   <li><strong>Compte cible inexistant</strong> : Mimikatz peut forger des tickets pour des comptes qui n’existent même pas dans AD.</li>
-  <li><strong>Algorithme RC4</strong> alors que la politique impose AES.</li>
-</ul>
-
-<h3 id="détecter-le-silver-ticket">Détecter le Silver Ticket</h3>
-
-<p>Le plus furtif. Comme il ne passe pas par le KDC, <strong>pas d’event 4769 sur le DC</strong>. Il faut surveiller <strong>côté serveurs cibles</strong> :</p>
-
-<ul>
+  <li><strong>Algorithme RC4</strong> alors que la politique impose AES.
+    <h3 id="détecter-le-silver-ticket">Détecter le Silver Ticket</h3>
+    <p>Le plus furtif. Comme il ne passe pas par le KDC, <strong>pas d’event 4769 sur le DC</strong>. Il faut surveiller <strong>côté serveurs cibles</strong> :</p>
+  </li>
   <li><strong>Event 4624</strong> (login réussi) sans <strong>4769 correspondant</strong> côté DC.</li>
-  <li>Activer la <strong>validation PAC</strong> pour forcer le serveur à valider le ticket auprès du KDC.</li>
-</ul>
-
-<h3 id="outils-de-détection-à-léchelle">Outils de détection à l’échelle</h3>
-
-<p>Pour ne pas faire ça à la main :</p>
-
-<ul>
+  <li>Activer la <strong>validation PAC</strong> pour forcer le serveur à valider le ticket auprès du KDC.
+    <h3 id="outils-de-détection-à-léchelle">Outils de détection à l’échelle</h3>
+    <p>Pour ne pas faire ça à la main :</p>
+  </li>
   <li><strong>SIEM</strong> (Splunk, Sentinel, Elastic) avec règles dédiées Kerberos.</li>
   <li><strong>Microsoft Defender for Identity</strong> (anciennement Azure ATP) : détection comportementale native.</li>
   <li><strong>Solutions de deception</strong> (canary accounts SPN à mots de passe faibles → si quelqu’un les crack, alerte immédiate).</li>
-  <li><strong>Honey tokens</strong> : créer un compte avec SPN et privilèges apparents mais surveillé H24.</li>
-</ul>
-
-<hr />
-
-<h2 id="6-bonnes-pratiques-générales">6. Bonnes pratiques générales</h2>
-
-<p>Pour finir, un récap des <strong>mesures à appliquer</strong> dans tout environnement AD :</p>
-
-<ol>
-  <li><strong>Désactiver RC4</strong> au profit d’AES uniquement.</li>
-  <li><strong>Migrer les comptes de service vers gMSA</strong> dès que possible.</li>
-  <li><strong>Mots de passe longs</strong> (&gt;25 caractères) sur les comptes de service restants.</li>
-  <li><strong>Audit régulier</strong> des comptes avec SPN, des comptes sans pré-auth, et des permissions du compte krbtgt.</li>
-  <li><strong>Rotation du mot de passe krbtgt</strong> (deux fois) tous les 6-12 mois.</li>
-  <li><strong>Modèle Tier</strong> (Tier 0 / 1 / 2) pour cloisonner les administrations.</li>
-  <li><strong>Aucun compte de service ne doit être Domain Admin</strong>.</li>
-  <li><strong>Logs d’audit Kerberos activés et centralisés</strong> dans un SIEM.</li>
-  <li><strong>Détection comportementale</strong> (UEBA) sur les comptes à privilèges.</li>
-  <li><strong>Plan de réponse à incident</strong> documenté pour le cas Golden Ticket (qui implique un reset complet de krbtgt).</li>
-</ol>
-
-<hr />
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>Kerberos n’est <strong>pas un protocole vulnérable en soi</strong>. Il a été conçu en 1988 au MIT et reste cryptographiquement solide. Les attaques qu’on a vues exploitent toutes des <strong>faiblesses opérationnelles</strong> : mots de passe faibles, mauvaises configurations, comptes oubliés, privilèges excessifs.</p>
-
-<p>La bonne nouvelle, c’est que <strong>toutes ces attaques laissent des traces</strong>, à condition d’avoir l’audit activé et une équipe qui sait quoi chercher. La détection Kerberos n’est pas hors de portée : c’est une question de <strong>logs, de règles SIEM et de connaissance du protocole</strong>.</p>
-
-<p>Si tu débutes en blue team Active Directory, je te conseille de :</p>
-<ol>
-  <li>Monter un lab AD (Windows Server eval + quelques VM).</li>
-  <li>Installer Mimikatz, Rubeus, Impacket côté attaquant.</li>
-  <li>Activer l’audit avancé Kerberos côté DC.</li>
-  <li>Reproduire les attaques et <strong>observer ce qui apparaît dans les logs</strong>.</li>
-</ol>
-
-<p>C’est en faisant l’attaque que tu comprends la défense.</p>
-
-<hr />
-
-<h2 id="pour-aller-plus-loin">Pour aller plus loin</h2>
-
-<ul>
+  <li>
+    <h2 id="honey-tokens--créer-un-compte-avec-spn-et-privilèges-apparents-mais-surveillé-h24"><strong>Honey tokens</strong> : créer un compte avec SPN et privilèges apparents mais surveillé H24.</h2>
+    <h2 id="6-bonnes-pratiques-générales">6. Bonnes pratiques générales</h2>
+    <p>Pour finir, un récap des <strong>mesures à appliquer</strong> dans tout environnement AD :</p>
+    <ol>
+      <li><strong>Désactiver RC4</strong> au profit d’AES uniquement.</li>
+      <li><strong>Migrer les comptes de service vers gMSA</strong> dès que possible.</li>
+      <li><strong>Mots de passe longs</strong> (&gt;25 caractères) sur les comptes de service restants.</li>
+      <li><strong>Audit régulier</strong> des comptes avec SPN, des comptes sans pré-auth, et des permissions du compte krbtgt.</li>
+      <li><strong>Rotation du mot de passe krbtgt</strong> (deux fois) tous les 6-12 mois.</li>
+      <li><strong>Modèle Tier</strong> (Tier 0 / 1 / 2) pour cloisonner les administrations.</li>
+      <li><strong>Aucun compte de service ne doit être Domain Admin</strong>.</li>
+      <li><strong>Logs d’audit Kerberos activés et centralisés</strong> dans un SIEM.</li>
+      <li><strong>Détection comportementale</strong> (UEBA) sur les comptes à privilèges.</li>
+      <li>
+        <h2 id="plan-de-réponse-à-incident-documenté-pour-le-cas-golden-ticket-qui-implique-un-reset-complet-de-krbtgt"><strong>Plan de réponse à incident</strong> documenté pour le cas Golden Ticket (qui implique un reset complet de krbtgt).</h2>
+        <h2 id="conclusion">Conclusion</h2>
+        <p>Kerberos n’est <strong>pas un protocole vulnérable en soi</strong>. Il a été conçu en 1988 au MIT et reste cryptographiquement solide. Les attaques qu’on a vues exploitent toutes des <strong>faiblesses opérationnelles</strong> : mots de passe faibles, mauvaises configurations, comptes oubliés, privilèges excessifs.
+La bonne nouvelle, c’est que <strong>toutes ces attaques laissent des traces</strong>, à condition d’avoir l’audit activé et une équipe qui sait quoi chercher. La détection Kerberos n’est pas hors de portée : c’est une question de <strong>logs, de règles SIEM et de connaissance du protocole</strong>.
+Si tu débutes en blue team Active Directory, je te conseille de :</p>
+      </li>
+      <li>Monter un lab AD (Windows Server eval + quelques VM).</li>
+      <li>Installer Mimikatz, Rubeus, Impacket côté attaquant.</li>
+      <li>Activer l’audit avancé Kerberos côté DC.</li>
+      <li>Reproduire les attaques et <strong>observer ce qui apparaît dans les logs</strong>.
+C’est en faisant l’attaque que tu comprends la défense.
+—
+        <h2 id="pour-aller-plus-loin">Pour aller plus loin</h2>
+      </li>
+    </ol>
+  </li>
   <li><a href="https://www.rfc-editor.org/rfc/rfc4120">RFC 4120 - The Kerberos Network Authentication Service (V5)</a></li>
   <li><a href="https://attack.mitre.org/techniques/T1558/003/">MITRE ATT&amp;CK - Kerberoasting (T1558.003)</a></li>
   <li><a href="https://attack.mitre.org/techniques/T1558/004/">MITRE ATT&amp;CK - AS-REP Roasting (T1558.004)</a></li>
   <li><a href="https://attack.mitre.org/techniques/T1558/001/">MITRE ATT&amp;CK - Golden Ticket (T1558.001)</a></li>
   <li><a href="https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/audit-kerberos-service-ticket-operations">Microsoft - Audit Kerberos Service Ticket Operations</a></li>
-  <li><a href="https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/kerberos-authentication">HackTricks - Kerberos Authentication</a></li>
+  <li>
+    <h2 id="hacktricks---kerberos-authentication"><a href="https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/kerberos-authentication">HackTricks - Kerberos Authentication</a></h2>
+    <p><em>Si cet article t’a plu, n’hésite pas à le partager. Le prochain abordera <strong>NTLM et le pass-the-hash</strong>, dans la même logique.</em></p>
+  </li>
 </ul>
-
-<hr />
-
-<p><em>Si cet article t’a plu, n’hésite pas à le partager. Le prochain abordera <strong>NTLM et le pass-the-hash</strong>, dans la même logique.</em></p>
 
       
     </div>
