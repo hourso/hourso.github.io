@@ -188,15 +188,9 @@
 <p>Au-delà du Pass-the-Hash, NTLM est vulnérable à d’autres types d’attaques :</p>
 
 <ul>
-  <li>
-    <p><strong>L’empoisonnement NTLM (NTLM Relay)</strong> : un attaquant intercepte une authentification NTLM et la rejoue vers un autre serveur pour accéder à des ressources en se faisant passer pour l’utilisateur légitime.</p>
-  </li>
-  <li>
-    <p><strong>L’abaissement NTLM (NTLM Downgrade)</strong> : un attaquant force l’utilisation de NTLMv1 (moins sécurisé) au lieu de NTLMv2 en manipulant les paramètres de négociation.</p>
-  </li>
-  <li>
-    <p><strong>L’attaque de l’homme du milieu (NTLM MitM)</strong> : en se positionnant entre le client et le serveur (sur un point d’accès WiFi compromis par exemple), un attaquant peut capturer des hashs NTLM et tenter de les cracker offline.</p>
-  </li>
+  <li><strong>L’empoisonnement NTLM (NTLM Relay)</strong> : un attaquant intercepte une authentification NTLM et la rejoue vers un autre serveur pour accéder à des ressources en se faisant passer pour l’utilisateur légitime.</li>
+  <li><strong>L’abaissement NTLM (NTLM Downgrade)</strong> : un attaquant force l’utilisation de NTLMv1 (moins sécurisé) au lieu de NTLMv2 en manipulant les paramètres de négociation.</li>
+  <li><strong>L’attaque de l’homme du milieu (NTLM MitM)</strong> : en se positionnant entre le client et le serveur (sur un point d’accès WiFi compromis par exemple), un attaquant peut capturer des hashs NTLM et tenter de les cracker offline.</li>
 </ul>
 
 <p>En 2021 par exemple, le groupe Hafnium a exploité des vulnérabilités Exchange pour déployer des web shells et voler des hashs NTLM via le canal HTTP. Ces hashs ont ensuite permis des mouvements latéraux et des élévations de privilèges.</p>
